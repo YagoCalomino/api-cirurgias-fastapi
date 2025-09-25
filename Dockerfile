@@ -7,6 +7,8 @@ WORKDIR /code
 # Etapa 3: Copia o arquivo de dependências para dentro do contêiner
 COPY ./requirements.txt /code/requirements.txt
 
+RUN apt-get update && apt-get install -y build-essential
+
 # Etapa 4: Instala as dependências
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
