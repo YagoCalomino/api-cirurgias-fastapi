@@ -1,4 +1,5 @@
 # app/security.py
+import os
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -10,7 +11,8 @@ from sqlalchemy.orm import Session
 from . import models, schemas
 from .database import get_db
 
-SECRET_KEY = "sua_chave_secreta_super_dificil_de_adivinhar_12345"
+# Lê a SECRET_KEY da variável de ambiente
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
