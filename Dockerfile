@@ -1,5 +1,5 @@
 # Etapa 1: Usa uma imagem oficial do Python como base
-FROM python:3.11-slim
+FROM python:3.11.9-slim-bullseye
 
 # Etapa 2: Defini o diretório de trabalho dentro do contêiner
 WORKDIR /code
