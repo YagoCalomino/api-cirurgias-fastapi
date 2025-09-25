@@ -4,6 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import date, timedelta
+from fastapi.middleware.cors import CORSMiddleware
 
 from . import models, schemas, security
 from .database import engine, get_db
@@ -11,6 +12,21 @@ from .database import engine, get_db
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="API de Cirurgias Refatorada")
+
+origins = [
+    "http://localhost",
+    "http://localhost:5173",  #  porta padrão do Vite/React
+    "http://localhost:3000",  #  porta para desenvolvimento frontend
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,       # Permite as origens listadas
+    allow_credentials=True,
+    allow_methods=["*"],         # Permite todos os métodos (GET, POST, etc.)
+    allow_headers=["*"],         # Permite todos os cabeçalhos
+)
+
 
 @app.post("/token", response_model=schemas.Token, tags=["Autenticação"])
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
