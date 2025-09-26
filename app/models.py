@@ -1,13 +1,33 @@
 # app/models.py
-from sqlalchemy import Column, Integer, String, Date, Time, Text, ForeignKey
-from sqlalchemy.orm import relationship
-from .database import Base
+from sqlalchemy import Column, Integer, String, Date, Time, Text, ForeignKey, Table
+from sqlalchemy.orm import relationship, declarative_base
+
+# Base para os modelos SQLAlchemy
+Base = declarative_base()
+
+#  tabela de associação para a equipe cirúrgica.
+# abelas 'cirurgias' e 'profissionais'.
+equipe_cirurgica_association = Table('equipe_cirurgica', Base.metadata,
+    Column('cirurgia_id', Integer, ForeignKey('cirurgias.codigo_cirurgia', ondelete="CASCADE"), primary_key=True),
+    Column('profissional_id', Integer, ForeignKey('profissionais.id', ondelete="CASCADE"), primary_key=True),
+    Column('funcao', String)
+)
 
 class UserDB(Base):
     __tablename__ = "usuarios"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+
+#  novo modelo para Profissionais
+class ProfissionalDB(Base):
+    __tablename__ = "profissionais"
+    id = Column(Integer, primary_key=True, index=True)
+    nome = Column(String, nullable=False)
+    conselho_profissional = Column(String)
+    
+    # relação para ver em quais cirurgias este profissional participou
+    cirurgias = relationship("CirurgiaDB", secondary=equipe_cirurgica_association, back_populates="equipe")
 
 class CirurgiaDB(Base):
     __tablename__ = "cirurgias"
@@ -26,14 +46,5 @@ class CirurgiaDB(Base):
     medico_conselho = Column(String)
     procedimento_descricao = Column(Text)
     
-    equipe = relationship("EquipeDB", back_populates="cirurgia", cascade="all, delete-orphan")
-
-class EquipeDB(Base):
-    __tablename__ = "equipe_cirurgica"
-    id = Column(Integer, primary_key=True, index=True)
-    nome_profissional = Column(String)
-    conselho_profissional = Column(String)
-    funcao = Column(String)
-    cirurgia_id = Column(Integer, ForeignKey("cirurgias.codigo_cirurgia"))
-
-    cirurgia = relationship("CirurgiaDB", back_populates="equipe")
+    # relação muitos-para-muitos usando a tabela de associação 'secondary'
+    equipe = relationship("ProfissionalDB", secondary=equipe_cirurgica_association, back_populates="cirurgias")
