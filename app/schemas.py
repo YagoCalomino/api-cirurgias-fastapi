@@ -30,6 +30,7 @@ class CirurgiaSchema(BaseModel):
     status_codigo: str
     status_descricao: str
     paciente_nome: str
+    medico_nome: str
     equipe: List[EquipeSchema] = []
 
 class CirurgiaCreateSchema(BaseModel):
