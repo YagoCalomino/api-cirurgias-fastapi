@@ -14,12 +14,25 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: Optional[str] = None
 
-class EquipeSchema(BaseModel):
-    model_config = {"from_attributes": True}
-    nome_profissional: str
-    conselho_profissional: str
-    funcao: str
+class ProfissionalBase(BaseModel):
+    nome: str
+    conselho_profissional: Optional[str] = None
 
+class ProfissionalCreate(ProfissionalBase):
+    pass
+
+class ProfissionalSchema(ProfissionalBase):
+    id: int
+    model_config = {"from_attributes": True}
+
+
+# dados da equipe apareçam dentro de uma cirurgia
+class MembroEquipeInfo(BaseModel):
+    funcao: str
+    profissional: ProfissionalSchema
+    model_config = {"from_attributes": True}
+
+# API deve retornar quando peço uma cirurgia
 class CirurgiaSchema(BaseModel):
     model_config = {"from_attributes": True}
     codigo_cirurgia: int
@@ -31,8 +44,10 @@ class CirurgiaSchema(BaseModel):
     status_descricao: str
     paciente_nome: str
     medico_nome: str
-    equipe: List[EquipeSchema] = []
+    # A equipe será uma lista contendo os dados completos dos profissionais
+    equipe: List[ProfissionalSchema] = []
 
+# dados necessários para criar uma nova cirurgia
 class CirurgiaCreateSchema(BaseModel):
     codigo_cirurgia: int
     codigo_estabelecimento: int
@@ -48,4 +63,5 @@ class CirurgiaCreateSchema(BaseModel):
     medico_nome: str
     medico_conselho: str
     procedimento_descricao: str
-    equipe: List[EquipeSchema]
+    # Para criar, lista de IDs dos profissionais e suas funções
+    equipe: List[int] = [] # Por enquanto, vamos enviar só os IDs.
